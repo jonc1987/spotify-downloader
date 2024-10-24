@@ -15,5 +15,5 @@ COPY . .
 RUN apt-get update && apt-get install -y ffmpeg
 
 # Run spotDL command on container start (e.g., download a song)
-CMD ["spotdl", "download", "https://open.spotify.com/track/example"]
+CMD ["spotdl", "download", "https://open.spotify.com/track/3uUuGVFu1V7jTQL60S1r8z?si=afeb051425674185"]
 
