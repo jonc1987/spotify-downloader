@@ -1,42 +1,19 @@
-FROM python:3-alpine
+# Use an official Python runtime as a base image
+FROM python:3.10-slim
 
-LABEL maintainer="xnetcat (Jakub)"
+# Set the working directory
+WORKDIR /app
 
-# Install dependencies
-RUN apk add --no-cache \
-    ca-certificates \
-    ffmpeg \
-    openssl \
-    aria2 \
-    g++ \
-    git \
-    py3-cffi \
-    libffi-dev \
-    zlib-dev
+# Copy the requirements and install them
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install poetry and update pip/wheel
-RUN pip install --upgrade pip poetry wheel spotipy
+# Copy the rest of the application code
+COPY . .
 
-# Copy requirements files
-COPY poetry.lock pyproject.toml /
+# Install ffmpeg
+RUN apt-get update && apt-get install -y ffmpeg
 
-# Install spotdl requirements
-RUN poetry install
+# Run spotDL command on container start (e.g., download a song)
+CMD ["spotdl", "download", "https://open.spotify.com/track/example"]
 
-# Add source code files to WORKDIR
-ADD . .
-
-# Install spotdl itself
-RUN poetry install
-
-# Create music directory
-RUN mkdir /music
-
-# Create a volume for the output directory
-VOLUME /music
-
-# Change CWD to /music
-WORKDIR /music
-
-# Entrypoint command
-ENTRYPOINT ["poetry", "run", "spotdl"]
